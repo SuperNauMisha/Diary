@@ -34,7 +34,14 @@ def index():
         subjects = db_sess.query(Subjects)
         marks = db_sess.query(Marks).filter(
             (Marks.user_id == current_user.id))
-        return render_template("index.html", subjects=subjects, marks=marks)
+        marks_subject_id  = []
+        not_empty_subj = []
+        for mark in marks:
+            marks_subject_id.append(mark.subject_id)
+        for sub in subjects:
+            if sub.id in marks_subject_id and sub not in not_empty_subj:
+                not_empty_subj.append(sub)
+        return render_template("index.html", subjects=not_empty_subj, marks=marks)
     return render_template("index.html", subjects=[], marks=[])
 
 @app.route('/logout')
@@ -111,6 +118,21 @@ def add_marks():
         return redirect('/')
     return render_template('marks.html', title='Добавление оценки',
                            form=form)
+
+@app.route('/marks_delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def marks_delete(id):
+    db_sess = db_session.create_session()
+    marks = db_sess.query(Marks).filter(Marks.subject_id == id,
+                                      Marks.user_id == current_user.id)
+    if marks:
+        for i in marks:
+            db_sess.delete(i)
+        db_sess.commit()
+    else:
+        abort(404)
+    return redirect('/')
+
 
 
 def main():
