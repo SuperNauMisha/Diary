@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Оценки</h1>
+{% for subject in subjects%}
+    <div class="col-md6 border rounded">
+        <h3>{{subject.name}}</h3>
+        {% for mark in marks%}
+            {% if mark.subject_id == subject.id %}
+                <a>{{mark.mark}}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <p></p>
+{% endfor %}
+{% endblock %}
